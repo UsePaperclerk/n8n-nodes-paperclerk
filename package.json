@@ -1,0 +1,65 @@
+{
+	"name": "@usepaperclerk/n8n-nodes-paperclerk",
+	"version": "0.0.0",
+	"description": "n8n node for PaperClerk: fill your own Word-based templates and get pixel-identical PDFs, and start workflows when documents are generated.",
+	"license": "MIT",
+	"homepage": "https://usepaperclerk.com",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n",
+		"paperclerk",
+		"pdf",
+		"pdf-generation",
+		"document-generation",
+		"templates",
+		"docx",
+		"invoice",
+		"contract"
+	],
+	"author": {
+		"name": "PaperClerk",
+		"email": "hello@usepaperclerk.com",
+		"url": "https://usepaperclerk.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/UsePaperclerk/n8n-nodes-paperclerk.git"
+	},
+	"bugs": {
+		"url": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk/issues"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist",
+		"!dist/tsconfig.tsbuildinfo"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/PaperClerkApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/PaperClerk/PaperClerk.node.js",
+			"dist/nodes/PaperClerk/PaperClerkTrigger.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "^0.53.4",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^21.1.0",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}

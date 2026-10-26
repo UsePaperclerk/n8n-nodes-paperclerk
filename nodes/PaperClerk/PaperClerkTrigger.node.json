@@ -1,0 +1,19 @@
+{
+	"node": "@usepaperclerk/n8n-nodes-paperclerk.paperClerkTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Productivity", "Utility"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk#readme"
+			}
+		]
+	},
+	"alias": ["PDF", "Document", "Template", "Invoice", "Contract", "Word", "DOCX", "Generate"]
+}
