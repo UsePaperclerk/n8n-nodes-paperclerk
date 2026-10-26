@@ -1,5 +1,5 @@
 {
-	"node": "@usepaperclerk/n8n-nodes-paperclerk.paperClerkTrigger",
+	"node": "@paperclerk/n8n-nodes-paperclerk.paperClerkTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Productivity", "Utility"],

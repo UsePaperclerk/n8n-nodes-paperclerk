@@ -9,7 +9,7 @@ A typical workflow: a new row in Google Sheets, a form submission or a closed de
 
 ## Installation
 
-**Self-hosted n8n:** open **Settings > Community Nodes**, select **Install**, enter `@usepaperclerk/n8n-nodes-paperclerk`, and confirm. See n8n's [community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) for the other ways to install.
+**Self-hosted n8n:** open **Settings > Community Nodes**, select **Install**, enter `@paperclerk/n8n-nodes-paperclerk`, and confirm. See n8n's [community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) for the other ways to install.
 
 **n8n Cloud:** only verified community nodes install there, from the nodes panel. This package is not verified yet, so for now it installs on self-hosted n8n only.
 

@@ -1,5 +1,5 @@
 {
-	"name": "@usepaperclerk/n8n-nodes-paperclerk",
+	"name": "@paperclerk/n8n-nodes-paperclerk",
 	"version": "0.0.0",
 	"description": "n8n node for PaperClerk: fill your own Word-based templates and get pixel-identical PDFs, and start workflows when documents are generated.",
 	"license": "MIT",
