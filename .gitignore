@@ -1,2 +1,7 @@
 dist
 node_modules
+
+# Local secrets, never committed. .env.example is the template.
+.env
+.env.*
+!.env.example
