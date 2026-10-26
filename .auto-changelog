@@ -1,0 +1,6 @@
+{
+	"commitUrl": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk/commit/{id}",
+	"compareUrl": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk/compare/{from}...{to}",
+	"issueUrl": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk/issues/{id}",
+	"mergeUrl": "https://github.com/UsePaperclerk/n8n-nodes-paperclerk/pull/{id}"
+}
