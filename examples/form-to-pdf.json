@@ -1,0 +1,210 @@
+{
+	"id": "pcExampleForm002",
+	"name": "PaperClerk: turn a template into a form that returns the PDF",
+	"nodes": [
+		{
+			"id": "adb49c6e-dc9d-4411-b30f-a64307c404a4",
+			"name": "Sticky Note",
+			"type": "n8n-nodes-base.stickyNote",
+			"typeVersion": 1,
+			"position": [
+				-520,
+				-280
+			],
+			"parameters": {
+				"content": "## Turn a PaperClerk template into a form\n\n### How it works\n1. **Start the form** opens a two-page web form. Page one asks what to call the document.\n2. **Get the template** reads the template's placeholders, and **Ask for the details** turns them into page two: dropdowns for choices, date pickers for dates, a box for each repeating section.\n3. **Prepare the values** splits each box into rows, one per line, with columns separated by `|`.\n4. **Generate the PDF** fills the template with the answers, and **Return the PDF** sends the file back to the browser.\n\n### Setup\n1. Create a **PaperClerk API** credential with a key from PaperClerk's **Connections** page, and select it in both PaperClerk nodes.\n2. Choose a template in **Get the template**.\n3. Execute the workflow. The test form opens in a new tab.\n\nFields left empty keep the template's default values. Automatic placeholders, such as a running number or today's date, are filled by PaperClerk.",
+				"width": 440,
+				"height": 560
+			}
+		},
+		{
+			"id": "9aed8deb-38eb-468e-b3b1-b4081d707c43",
+			"name": "Start the form",
+			"type": "n8n-nodes-base.formTrigger",
+			"typeVersion": 2.5,
+			"position": [
+				0,
+				0
+			],
+			"webhookId": "287fe8d3-7aea-4b19-86be-ef7d015d98b2",
+			"parameters": {
+				"formTitle": "Create a document",
+				"formDescription": "Answer a few questions and get the finished PDF.",
+				"formFields": {
+					"values": [
+						{
+							"fieldLabel": "Document title",
+							"placeholder": "e.g. Order for Maple & Fern"
+						}
+					]
+				},
+				"options": {
+					"buttonLabel": "Next",
+					"appendAttribution": false
+				}
+			}
+		},
+		{
+			"id": "67d64926-961e-4ed8-bc5d-21cab085505b",
+			"name": "Get the template",
+			"type": "@paperclerk/n8n-nodes-paperclerk.paperClerk",
+			"typeVersion": 1,
+			"position": [
+				220,
+				0
+			],
+			"parameters": {
+				"resource": "template",
+				"operation": "get",
+				"template": {
+					"__rl": true,
+					"mode": "list",
+					"value": ""
+				},
+				"simplify": true
+			}
+		},
+		{
+			"id": "a2466280-1cc4-420f-90f6-7f3fd5d8690e",
+			"name": "Ask for the details",
+			"type": "n8n-nodes-base.form",
+			"typeVersion": 2.5,
+			"position": [
+				440,
+				0
+			],
+			"webhookId": "2c7c9b2d-a254-4c70-87e2-046c5f8d1d6a",
+			"parameters": {
+				"defineForm": "json",
+				"jsonOutput": "={{ $json.placeholders.filter(p => !p.auto).map(p => Object.assign({ fieldLabel: p.label, fieldName: p.key, fieldType: p.type === 'select' ? 'dropdown' : (p.type === 'date' ? 'date' : 'text'), placeholder: p.type === 'number' && p.format ? 'e.g. ' + p.format : (p.value || '') }, p.type === 'select' ? { fieldOptions: { values: p.options.map(o => ({ option: o })) } } : {})).concat($json.groups.map(g => ({ fieldLabel: g.label + ', one row per line, columns separated by |', fieldName: g.key, fieldType: 'textarea', placeholder: g.fields.map(f => f.label).join(' | ') }))) }}",
+				"options": {
+					"formTitle": "={{ $json.title }}",
+					"buttonLabel": "Create the PDF"
+				}
+			}
+		},
+		{
+			"id": "e4084b20-1418-4b97-95e4-1473f14d00b6",
+			"name": "Prepare the values",
+			"type": "n8n-nodes-base.code",
+			"typeVersion": 2,
+			"position": [
+				660,
+				0
+			],
+			"parameters": {
+				"jsCode": "// The form's answers are keyed by placeholder key. The box for a\n// repeating section becomes a list of rows: one row per line, its\n// columns separated by \"|\" in the order the section's fields are listed.\nconst template = $('Get the template').first().json;\nconst values = { ...$input.first().json };\n\nfor (const group of template.groups ?? []) {\n  const text = String(values[group.key] ?? '').trim();\n  delete values[group.key];\n  if (!text) continue;\n  values[group.key] = text\n    .split('\\n')\n    .map((line) => line.trim())\n    .filter(Boolean)\n    .map((line) => {\n      const cells = line.split('|').map((cell) => cell.trim());\n      return Object.fromEntries(group.fields.map((field, i) => [field.key, cells[i] ?? '']));\n    });\n}\n\nreturn [{ json: values }];"
+			}
+		},
+		{
+			"id": "64d2c498-205c-49dd-949f-dd4855190ddd",
+			"name": "Generate the PDF",
+			"type": "@paperclerk/n8n-nodes-paperclerk.paperClerk",
+			"typeVersion": 1,
+			"position": [
+				880,
+				0
+			],
+			"parameters": {
+				"resource": "document",
+				"operation": "generate",
+				"template": {
+					"__rl": true,
+					"mode": "id",
+					"value": "={{ $('Get the template').first().json.id }}"
+				},
+				"title": "={{ $('Start the form').first().json['Document title'] }}",
+				"inputMode": "map",
+				"placeholders": {
+					"mappingMode": "autoMapInputData",
+					"value": {},
+					"matchingColumns": [],
+					"schema": [],
+					"attemptToConvertTypes": false,
+					"convertFieldsToString": true
+				},
+				"options": {}
+			}
+		},
+		{
+			"id": "a167d618-3d16-4415-9ec2-9a346815bbd3",
+			"name": "Return the PDF",
+			"type": "n8n-nodes-base.form",
+			"typeVersion": 2.5,
+			"position": [
+				1100,
+				0
+			],
+			"webhookId": "52d21650-6399-4d0c-b459-cefe4eb3553c",
+			"parameters": {
+				"operation": "completion",
+				"respondWith": "returnBinary",
+				"completionTitle": "Your PDF is ready",
+				"completionMessage": "The document is also saved in PaperClerk, under Documents.",
+				"inputDataFieldName": "data",
+				"options": {}
+			}
+		}
+	],
+	"connections": {
+		"Start the form": {
+			"main": [
+				[
+					{
+						"node": "Get the template",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Get the template": {
+			"main": [
+				[
+					{
+						"node": "Ask for the details",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Ask for the details": {
+			"main": [
+				[
+					{
+						"node": "Prepare the values",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Prepare the values": {
+			"main": [
+				[
+					{
+						"node": "Generate the PDF",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Generate the PDF": {
+			"main": [
+				[
+					{
+						"node": "Return the PDF",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"pinData": {}
+}

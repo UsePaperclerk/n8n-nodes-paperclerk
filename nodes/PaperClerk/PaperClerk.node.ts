@@ -168,11 +168,22 @@ export class PaperClerk implements INodeType {
 
 		resourceMapping: {
 			async getPlaceholderColumns(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
-				const templateId = this.getNodeParameter('template', undefined, {
-					extractValue: true,
-				}) as string;
+				let templateId = '';
+				try {
+					templateId = String(
+						this.getNodeParameter('template', undefined, { extractValue: true }) ?? '',
+					);
+				} catch {
+					templateId = '';
+				}
 				if (!templateId) {
-					return { fields: [], emptyFieldsNotice: 'Choose a template first' };
+					// The editor resolves expressions before asking, so a template set
+					// by an expression that reads an earlier node arrives empty too.
+					return {
+						fields: [],
+						emptyFieldsNotice:
+							'Choose a template to see its placeholders. A template set by an expression is read when the workflow runs.',
+					};
 				}
 				const template = await getTemplate.call(this, templateId);
 				const fields: ResourceMapperField[] = [];
@@ -206,10 +217,13 @@ export class PaperClerk implements INodeType {
 						type: 'array',
 					});
 				}
-				return {
-					fields,
-					emptyFieldsNotice: 'This template has no placeholders to fill',
-				};
+				// The editor shows emptyFieldsNotice whenever it is not drawing the
+				// field list, Map Automatically included, so it is only sent when
+				// the template really has nothing to fill.
+				if (!fields.length) {
+					return { fields, emptyFieldsNotice: 'This template has no placeholders to fill' };
+				}
+				return { fields };
 			},
 		},
 	};

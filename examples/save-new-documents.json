@@ -1,0 +1,107 @@
+{
+	"id": "pcExampleSave003",
+	"name": "PaperClerk: save every new document to a folder",
+	"nodes": [
+		{
+			"id": "80c35f63-39d3-461a-8136-bbc3f5f9d8a6",
+			"name": "Sticky Note",
+			"type": "n8n-nodes-base.stickyNote",
+			"typeVersion": 1,
+			"position": [
+				-520,
+				-240
+			],
+			"parameters": {
+				"content": "## Save every new PaperClerk document to a folder\n\n### How it works\n1. **When a document is generated** checks PaperClerk every minute for new documents: made in the app, from ChatGPT or Claude, through the API or by n8n.\n2. **Download the PDF** fetches each new document's PDF.\n3. **Save it to a folder** writes it to disk, named after the document.\n\n### Setup\n1. Create a **PaperClerk API** credential with a key from PaperClerk's **Connections** page, and select it in both PaperClerk nodes.\n2. Set the folder in **Save it to a folder**. The folder has to exist, and n8n writes only inside folders that `N8N_RESTRICT_FILE_ACCESS_TO` allows (`~/.n8n-files` by default).\n3. Execute the workflow once: the trigger fetches your newest document. Then publish the workflow, and every document generated after that is saved within a minute.",
+				"width": 440,
+				"height": 480
+			}
+		},
+		{
+			"id": "6db5882b-a578-4605-ba58-30e99e90f6db",
+			"name": "When a document is generated",
+			"type": "@paperclerk/n8n-nodes-paperclerk.paperClerkTrigger",
+			"typeVersion": 1,
+			"position": [
+				0,
+				0
+			],
+			"parameters": {
+				"pollTimes": {
+					"item": [
+						{
+							"mode": "everyMinute"
+						}
+					]
+				},
+				"event": "documentGenerated",
+				"template": "",
+				"source": ""
+			}
+		},
+		{
+			"id": "1f0b6a52-6d1e-4c6b-9a43-2d0f2f6d7e11",
+			"name": "Download the PDF",
+			"type": "@paperclerk/n8n-nodes-paperclerk.paperClerk",
+			"typeVersion": 1,
+			"position": [
+				220,
+				0
+			],
+			"parameters": {
+				"resource": "document",
+				"operation": "downloadPdf",
+				"document": {
+					"__rl": true,
+					"mode": "id",
+					"value": "={{ $json.id }}"
+				},
+				"options": {}
+			}
+		},
+		{
+			"id": "5c3e9d10-8a7b-4f2e-b1c4-6e8f0a2b3d45",
+			"name": "Save it to a folder",
+			"type": "n8n-nodes-base.readWriteFile",
+			"typeVersion": 1.1,
+			"position": [
+				440,
+				0
+			],
+			"parameters": {
+				"operation": "write",
+				"fileName": "=/home/node/.n8n-files/{{ $binary.data.fileName }}",
+				"dataPropertyName": "data",
+				"options": {}
+			}
+		}
+	],
+	"connections": {
+		"When a document is generated": {
+			"main": [
+				[
+					{
+						"node": "Download the PDF",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Download the PDF": {
+			"main": [
+				[
+					{
+						"node": "Save it to a folder",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"pinData": {}
+}

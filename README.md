@@ -83,9 +83,24 @@ Generating is safe to retry. A request identical to one sent in the last 10 minu
 
 ## Using it with an AI agent
 
-The PaperClerk node can be used as a tool by n8n's AI Agent. On self-hosted n8n, community nodes need `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true` to be used as tools.
+The PaperClerk node can be used as a tool by n8n's AI Agent, where it appears as **PaperClerk Tool**. n8n 2.45 offers it with no extra setting; some earlier self-hosted versions offer community nodes as tools only with `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true`.
 
 PaperClerk also runs an MCP server that n8n's **MCP Client Tool** can use without this package: endpoint `https://usepaperclerk.com/api/mcp`, transport HTTP Streamable, and either *Bearer Auth* with a workspace API key or *MCP OAuth2*.
+
+## Example workflows
+
+The [`examples`](examples) folder holds four workflows to import into n8n with *Import from File* in the workflow menu. Each one opens with a note on how it works and how to set it up, and needs a PaperClerk API credential and a saved template.
+
+| File | What it does |
+| --- | --- |
+| [`generate-pdf-from-data.json`](examples/generate-pdf-from-data.json) | Fills a template from sample order data with *Map Automatically*: the line items become table rows and the ISO date is written in the template's date format. |
+| [`generate-and-email.json`](examples/generate-and-email.json) | Generates a PDF and emails it as an attachment with n8n's Send Email node, the pattern for handing the PDF to any next step. |
+| [`form-to-pdf.json`](examples/form-to-pdf.json) | Turns any saved template into a two-page n8n form and hands the finished PDF back to the browser. |
+| [`save-new-documents.json`](examples/save-new-documents.json) | Uses the trigger to save the PDF of every newly generated document to a folder. |
+
+## Running it locally
+
+On macOS or Linux with Node.js 22 or later, `npm run try` in a clone of this repository starts n8n at `http://localhost:5678` with this package installed from npm and the example workflows imported. That n8n keeps its data in `~/.n8n-paperclerk`, apart from any other n8n on the machine, listens on this machine only, and the folder example saves PDFs to `~/Downloads/PaperClerk`. `npm run dev` runs n8n with the node built from this repository instead, rebuilt on every change.
 
 ## What it does not do
 
@@ -99,7 +114,7 @@ The node reads templates and generates documents. It does not create, edit or de
 
 ## Compatibility
 
-Tested with n8n 2.44.7.
+Tested with n8n 2.44.7 and 2.45.4.
 
 ## Support
 
